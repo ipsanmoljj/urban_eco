@@ -23,8 +23,9 @@ Confidence tags carried over from earlier discussion:
 - Downloaded and in the repo root (not yet moved into `data/raw/`):
   - CHP Incidents, monthly, Jan–Sep 2026 (statewide; each zip holds the summary and detail files);
   - D7 Station Metadata versions dated 17 Jul, 25 Aug and 24 Oct 2026.
-- D7 Station Hour, Jul–Sep 2026: on the GitHub release `data-d7-2026` (§7.5).
-- **Missing:** Station Hour and metadata versions for Jan–Jun 2026.
+- D7 Station Hour, Jan–Sep 2026: on the GitHub release `data-d7-2026` (§7.5). All 9 files verified: complete hours, no duplicate rows.
+- **Missing:** D7 metadata versions for Jan–Jun 2026.
+- **Jan–Sep coverage** [Certain]: 1,227,191 fully observed mainline station-hours from 430 stations (Bento: 1.36M). Coverage falls through the year, from 267 observed stations per hour in January to 140 in September. Detectors are failing, not being repaired. I-10 and I-210 hold 47% of observed rows; I-405 holds 3.6%.
 - [Certain] **The PeMS Clearinghouse currently offers only 2026 data** (checked by Inderpal, 25 Oct 2026). Bento's Dataverse package is now the only source of 2017 data.
 
 **Detector coverage in 2026 is poor** [Certain, from the Jul–Sep files]:
