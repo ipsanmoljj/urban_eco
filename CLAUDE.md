@@ -23,7 +23,17 @@ Confidence tags carried over from earlier discussion:
 - Downloaded and in the repo root (not yet moved into `data/raw/`):
   - CHP Incidents, monthly, Jan–Sep 2026 (statewide; each zip holds the summary and detail files);
   - D7 Station Metadata versions dated 17 Jul, 25 Aug and 24 Oct 2026.
-- **Missing:** D7 Station Hour files (being uploaded; too large for the GitHub web UI, see §7.5), and metadata versions from Jan–Jun 2026.
+- D7 Station Hour, Jul–Sep 2026: on the GitHub release `data-d7-2026` (§7.5).
+- **Missing:** Station Hour and metadata versions for Jan–Jun 2026.
+- [Certain] **The PeMS Clearinghouse currently offers only 2026 data** (checked by Inderpal, 25 Oct 2026). Bento's Dataverse package is now the only source of 2017 data.
+
+**Detector coverage in 2026 is poor** [Certain, from the Jul–Sep files]:
+- 1,572 of 1,936 D7 mainline stations report 0% observed for the whole quarter. Their speed and flow are entirely imputed.
+- Fully observed (`% Observed = 100`) mainline data: 370,002 station-hours, 271 stations, about 168 stations per hour. Bento's 2017 sample averaged about 616 per hour (1.36M ÷ 2,208).
+- I-10 and I-210 hold 52% of the fully observed rows. I-405 is thin and I-110 is nearly absent.
+- Never use imputed rows for the slope: PeMS imputes speed from neighbouring stations and history.
+- [Likely] Only the *treated* station needs real readings. Crashes and alternate routes are located from CHP lat/lon and station metadata, and imputed stations still have valid locations.
+- [Guessing] First-stage power scales roughly with sample size, so a Jul–Sep sample would give a KP F of about 4 against Bento's 15.9. Jan–Sep would give roughly 12. Get Jan–Jun before building the instrument.
 - The Bento Dataverse package has not been opened. Dataverse is blocked from the cloud session too (proxy 403), so Inderpal downloads it manually.
 - Nothing has been coded.
 
@@ -352,7 +362,7 @@ Options discussed for where ML could do real work:
 - **NYC taxi and other trajectory-like datasets:** a fleet is an unrepresentative slice of traffic, so there is no total density.
 - **INRIX:** commercial. The trajectory-ML track only starts if trajectory data is obtained.
 - **Merging Akbar et al. into the main analysis:** it would dilute both.
-- **Using 2017 PeMS data as the main sample** (decided 25 Oct 2026): the analysis uses 2026. Bento's 2017 data is used only to validate code (§3 step 2).
+- **Using 2017 PeMS data as the main sample** (decided 25 Oct 2026): the analysis uses 2026. Bento's 2017 data is used only to validate code (§3 step 2). The Clearinghouse no longer offers years before 2026 anyway.
 
 ---
 
