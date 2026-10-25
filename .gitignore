@@ -1,0 +1,4 @@
+# Large raw PeMS files live in GitHub Releases (see CLAUDE.md §7.5)
+data/raw/pems/*/station_hour/
+*station_hour*.txt.gz
+*station_hour*.txt
