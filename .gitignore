@@ -2,3 +2,4 @@
 data/raw/pems/*/station_hour/
 *station_hour*.txt.gz
 *station_hour*.txt
+data/interim/

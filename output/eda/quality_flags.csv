@@ -1,0 +1,10 @@
+check,rows
+"ML station-hours, all",12585535.0
+"ML station-hours, 0% observed (fully imputed)",10801085.0
+"ML station-hours, 1-99% observed",557259.0
+"ML station-hours, 100% observed",1227191.0
+observed: speed below 5 mph,104.0
+observed: zero flow,2380.0
+"observed: lane flow above 2,500 veh/hr",51.0
+observed: occupancy above 0.5,831.0
+observed: fewer lanes reporting than metadata,12952.0

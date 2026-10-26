@@ -36,7 +36,7 @@ Confidence tags carried over from earlier discussion:
 - [Likely] Only the *treated* station needs real readings. Crashes and alternate routes are located from CHP lat/lon and station metadata, and imputed stations still have valid locations.
 - [Guessing] First-stage power scales roughly with sample size, so a Jul–Sep sample would give a KP F of about 4 against Bento's 15.9. Jan–Sep would give roughly 12. Get Jan–Jun before building the instrument.
 - The Bento Dataverse package has not been opened. Dataverse is blocked from the cloud session too (proxy 403), so Inderpal downloads it manually.
-- Nothing has been coded.
+- EDA done (26 Oct 2026): `src/eda/`, findings and proposed cleaning rules in `output/eda/EDA_REPORT.md`. **Cleaning rules await Inderpal's confirmation; don't apply them before that.**
 
 **First job.** Get the Bento Dataverse package and inventory it:
 - files and variables,

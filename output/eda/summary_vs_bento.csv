@@ -1,0 +1,11 @@
+measure,d7_2026_observed,bento_2017_table1
+Station-hours,"1,227,191","1,362,961"
+Stations,430,"1,318"
+"Lane speed, mean (mph)",61.2,60.9
+"Lane speed, flow-weighted mean (mph)",58.4,about 62
+"Lane flow, mean (veh/hr)",882,"1,438"
+"Lane flow, max (veh/hr)","2,952","5,173"
+"Lane density, mean (veh/mile)",16.7,28.2
+"Lane density, max (veh/mile)",144,189
+Share of hours above 21 veh/mile,29.0%,not reported
+Share of hours above 30.6 veh/mile,11.0%,not reported
