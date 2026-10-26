@@ -1,6 +1,6 @@
 # Congestion Pricing on California Freeways: Project Brief
 
-This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 25 Oct 2026.
+This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 26 Oct 2026 (end of the second working session).
 
 Confidence tags carried over from earlier discussion:
 - **[Certain]**: read directly from the paper or checked by arithmetic.
@@ -11,20 +11,42 @@ Confidence tags carried over from earlier discussion:
 
 ## 0. Read this first
 
+### Start here (next session, 27 Oct 2026)
+
+**Done so far:** design settled; 2026 D7 data collected and checked; EDA; cleaning (rules agreed); links, incident matching, own-link flags and D7 VMT built; preliminary breakpoint search. Everything is on branch `claude/brief-2026-data`, in draft PR ipsanmoljj/urban_eco#1.
+
+**Waiting on Inderpal before anything else:**
+1. **Google Maps key.** A key was pasted into chat on 26 Oct. Treat it as exposed: **never write it to any file or commit.** Asked Inderpal to restrict it to the Routes API, set a daily quota and budget alert, regenerate it, and store the new one as the environment variable `GOOGLE_MAPS_API_KEY`. Read the key only from that variable. If it isn't set, ask.
+2. **Confirmation of the Part B plan** (below). Inderpal wants a plan update and an explicit go-ahead before each new stage.
+
+**Part B plan (proposed 26 Oct, not yet confirmed):**
+1. *(free)* Download the Bento Dataverse package into `data/raw/dataverse/` and inventory it. Key questions: their breakpoint formula (hinge or as printed), their crash definition, and whether their route list is included. Also download NOAA ISD-Lite hourly weather for six stations (LAX, Burbank, Long Beach, Van Nuys, Santa Monica, Camarillo) and EIA weekly LA regular gas prices, Jan–Sep 2026, into `data/raw/external/`.
+2. *(free)* LODES: the latest California OD file and the block crosswalk (block lat/lon). Keep pairs with both ends in LA (06037) or Ventura (06111). Sample 1% of commutes weighted by job counts (about 19k pairs, as in Bento).
+3. *(costs money)* Google Routes API, main route plus up to 2 alternatives, traffic-unaware (cheaper tier). **Pilot 100 requests first, show Inderpal the output and the billed cost, then wait for a go-ahead.** Cache every response to disk so nothing is paid for twice and runs can resume. [Guessing] Full run costs about $100–200 at list price.
+4. *(free)* Snap routes to mainline stations (within about 100 m, matching direction); take the non-overlapping parts; define treated station-hours; run the first stage. If the first stage is weak, stop and discuss before going further.
+
+**Open decisions still with Inderpal:** §10 (District 4 focus, ML component, toolchain). Python only so far (pyfixest).
+
+**Working rules agreed with Inderpal:**
+- Explain what you will do and why, then wait for confirmation before each new stage.
+- Raw files are never modified; cleaned data goes in `data/cleaned/`, derived data in `data/analysis/`.
+- Run every model with and without `flag_high_flow` rows.
+
+
 **Analysis year: 2026 (decided 25 Oct 2026).** The analysis uses 2026 PeMS data, not Bento's 2017 sample. This turns the project from an exact replication into a **re-estimation of Bento's design on 2026 data**, benchmarked against their published numbers. Consequences:
 - [Certain] Bento's Tables 2–4 can't be reproduced number for number from 2026 data. Gaps against the paper mix two causes: differences in our code, and real change between 2017 and 2026 (post-COVID demand, remote work, a changed detector network).
 - [Likely] The only way to separate the two is to run our pipeline on Bento's own 2017 data from the Dataverse package, if it is complete enough. That makes the package a code-validation tool rather than the main dataset.
 - [Likely] Upside: Google routes queried today now match the network in the data. In the 2017 design that mismatch was a weakness.
 - [Certain] The D7 network is much larger now: about 1,930 mainline (ML) stations in the 2026 metadata, against 1,318 used by Bento.
 
-**Status (25 Oct 2026).**
+**Status log (25–26 Oct 2026).**
 - The research design is settled. The year changed to 2026; see above.
 - Repo: `ipsanmoljj/urban_eco`.
 - Downloaded and in the repo root (not yet moved into `data/raw/`):
   - CHP Incidents, monthly, Jan–Sep 2026 (statewide; each zip holds the summary and detail files);
   - D7 Station Metadata versions dated 17 Jul, 25 Aug and 24 Oct 2026.
 - D7 Station Hour, Jan–Sep 2026: on the GitHub release `data-d7-2026` (§7.5). All 9 files verified: complete hours, no duplicate rows.
-- **Missing:** D7 metadata versions for Jan–Jun 2026.
+- **Missing:** D7 metadata versions for Jan–Jun 2026. Lower priority since the EDA: no station moved between Jul and Oct, and every station in the data appears in the metadata in hand.
 - **Jan–Sep coverage** [Certain]: 1,227,191 fully observed mainline station-hours from 430 stations (Bento: 1.36M). Coverage falls through the year, from 267 observed stations per hour in January to 140 in September. Detectors are failing, not being repaired. I-10 and I-210 hold 47% of observed rows; I-405 holds 3.6%.
 - [Certain] **The PeMS Clearinghouse currently offers only 2026 data** (checked by Inderpal, 25 Oct 2026). Bento's Dataverse package is now the only source of 2017 data.
 
@@ -35,7 +57,7 @@ Confidence tags carried over from earlier discussion:
 - Never use imputed rows for the slope: PeMS imputes speed from neighbouring stations and history.
 - [Likely] Only the *treated* station needs real readings. Crashes and alternate routes are located from CHP lat/lon and station metadata, and imputed stations still have valid locations.
 - [Guessing] First-stage power scales roughly with sample size, so a Jul–Sep sample would give a KP F of about 4 against Bento's 15.9. Jan–Sep would give roughly 12. Get Jan–Jun before building the instrument.
-- The Bento Dataverse package has not been opened. Dataverse is blocked from the cloud session too (proxy 403), so Inderpal downloads it manually.
+- The Bento Dataverse package has not been opened yet. As of 26 Oct the environment allows dataverse.harvard.edu, NOAA, EIA and LODES, so Claude Code can download them directly.
 - EDA done (26 Oct 2026): `src/eda/eda.py`, findings in `output/eda/EDA_REPORT.md`.
 - Cleaning done (26 Oct 2026, rules agreed with Inderpal): `src/data/02_clean.py` writes `data/cleaned/` (tracked in git; see its README). 1,209,294 station-hours, 422 stations. Decisions:
   - Lane flow above 2,500 is kept with `flag_high_flow`; **run every model with and without these rows.**
@@ -57,7 +79,7 @@ Its main uses now: reading their code and construction choices, and validating o
 
 **Blockers Claude Code can't solve alone.**
 - PeMS bulk data needs a logged-in account. Caltrans blocks programmatic access to the Clearinghouse. Inderpal downloads these files manually in the browser and puts them in `data/raw/pems/`. Claude Code should never try to log in or scrape PeMS.
-- The Dataverse download was blocked from the claude.ai sandbox. [Guessing] It may work from a local machine through the Dataverse API. If not, Inderpal downloads it manually.
+- ~~The Dataverse download was blocked.~~ Resolved 26 Oct: the host is now allowed in the environment.
 
 **Open decisions.** These are the user's calls; ask before assuming. See §10.
 
