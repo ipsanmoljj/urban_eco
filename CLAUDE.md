@@ -42,6 +42,9 @@ Confidence tags carried over from earlier discussion:
   - Main instrument uses **all CHP incidents** (Bento matched "every traffic incident report"); robustness checks use collisions only, and collisions plus hit-and-run.
   - Holidays kept with a flag; balanced-panel check on the 151 stations present in all nine months.
   - PeMS has no real D7 readings on 28 Feb, 27 May, 30 Aug–1 Sep, 5–7 Sep and 30 Sep 2026 (district-wide outages).
+- Part A of instrument construction done (26 Oct 2026): `src/build/01_links_incidents_vmt.py` writes `data/analysis/` (see its README). It covers links from ramp stations (1,137 links, median 0.78 mi), incident-to-station matching (94.3% matched), own-link incident flags (1.21% of station-hours) and hourly D7 VMT. **Estimate from `data/analysis/station_hour_d7_2026_analysis.parquet`.**
+- Preliminary breakpoint search (26 Oct 2026, `src/estimate/01_breakpoint_search.py`; FE plus D7 VMT, no weather or gas yet): the hinge form `(density−b)·1[density>b]` picks **19** (Bento: 21), with slope −0.028. Eq. 4 *as written* (`density·1[density>b]`) picks b = 1, which is degenerate. Its AIC curve has a second dip near 30, not at 21, so Bento's 21 probably came from a hinge-type form. Check their do-file. The high-flow rows make no difference (51 rows).
+- External hosts (NOAA, EIA, LODES, Dataverse) are now allowed in the environment. No Google Maps API key is set yet.
 - **What Bento et al. report about cleaning** [Certain]: only mainline stations and "station-hour observations where all the component detectors are reporting". There's no flow cap (their max lane flow is 5,173), and nothing on stuck detectors or holidays. Their incident counts also conflict: "more than 14,000 incidents" at "around 450 per day" implies about 31 days, while Table 1's 471/day over 92 days implies about 43,000.
 
 **First job.** Get the Bento Dataverse package and inventory it:
