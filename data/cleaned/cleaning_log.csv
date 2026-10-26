@@ -1,0 +1,7 @@
+step,rows_remaining,rows_dropped
+"all rows, all lane types",32082567,0
+1. mainline only,12585535,19497032
+2. % observed = 100,1227191,11358344
+3. all metadata lanes reporting,1214239,12952
+4. flow > 0,1211954,2285
+5. drop 3 stuck stations,1209294,2660

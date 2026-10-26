@@ -52,18 +52,10 @@ Mean density is 40% lower than theirs. Some of that is because the surviving sen
 - `fig4_freeway_coverage_vs_collisions.png`: sensors vs crashes by freeway
 - `fig5_station_persistence.png`: how many months each station reports
 
-## Proposed cleaning rules (need confirmation)
+## Cleaning rules (agreed 26 Oct 2026)
 
-| # | Rule | Rows affected | Recommendation |
-|---|---|---|---|
-| 1 | Keep mainline (ML) rows only | drops HOV, ramps, etc. | Keep, as in Bento et al. |
-| 2 | Keep `% Observed = 100` only | keeps 1,227,191 | Keep. Lowering to 75% adds few rows and brings in imputed lanes. |
-| 3 | Drop rows where fewer lanes report than the metadata lists | 12,952 (1.1%) | Drop. Per-lane density is unreliable when a lane is missing. |
-| 4 | Drop rows with zero flow but a recorded speed | 2,380 (0.2%) | Drop. Median speed in these rows is 68 mph, which looks like a detector fault, not empty roads. |
-| 5 | Drop lane flow above 2,500 veh/hr | 51 | Drop, as in the brief. |
-| 6 | Drop 4 stations whose speed barely varies (sd < 1 mph) | 2,714 | Drop. Stuck detectors. |
-| 7 | Keep speeds below 5 mph | 104 | Keep. These are plausible jams. |
-| 8 | Density = flow ÷ lanes reporting ÷ speed | all | Use lanes reporting, which equals metadata lanes once rule 3 is applied. |
-| 9 | Main sample: all 430 stations. Robustness check: the 152 stations present in all nine months | — | As stated. |
-| 10 | Crash definition: CHP codes 1179/1181/1182/1183 (collisions) plus 20001/20002 (hit-and-run) | 40,646 D7 events | Main definition. All incidents as a robustness check, after checking Bento et al.'s definition. |
-| 11 | Keep holidays, with a holiday flag | — | Keep, so they can be dropped later if needed. |
+These rules are now applied; see `data/cleaned/README.md`. Changes from the proposal:
+- Lane flow above 2,500 veh/hr is **kept and flagged** (`flag_high_flow`) rather than dropped. Models will be run with and without these rows.
+- The main crash definition is **all CHP incidents**, matching Bento et al., who "match every traffic incident report". Collisions only, and collisions plus hit-and-run, are robustness checks.
+
+Bento et al. report only rules 1 and 2 (mainline only; every detector reporting). Rules 3–5 are our additions.

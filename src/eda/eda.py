@@ -1,6 +1,6 @@
 """Exploratory analysis of the D7 2026 data (Station Hour, metadata, CHP incidents).
 
-Reads the parquet files written by 01_load_raw.py. Nothing here filters the data
+Reads the parquet files written by src/data/01_load_raw.py. Nothing here filters the data
 for estimation; it describes it so we can agree cleaning rules first.
 Outputs: output/eda/*.csv and output/eda/*.png
 """

@@ -36,7 +36,13 @@ Confidence tags carried over from earlier discussion:
 - [Likely] Only the *treated* station needs real readings. Crashes and alternate routes are located from CHP lat/lon and station metadata, and imputed stations still have valid locations.
 - [Guessing] First-stage power scales roughly with sample size, so a Jul–Sep sample would give a KP F of about 4 against Bento's 15.9. Jan–Sep would give roughly 12. Get Jan–Jun before building the instrument.
 - The Bento Dataverse package has not been opened. Dataverse is blocked from the cloud session too (proxy 403), so Inderpal downloads it manually.
-- EDA done (26 Oct 2026): `src/eda/`, findings and proposed cleaning rules in `output/eda/EDA_REPORT.md`. **Cleaning rules await Inderpal's confirmation; don't apply them before that.**
+- EDA done (26 Oct 2026): `src/eda/eda.py`, findings in `output/eda/EDA_REPORT.md`.
+- Cleaning done (26 Oct 2026, rules agreed with Inderpal): `src/data/02_clean.py` writes `data/cleaned/` (tracked in git; see its README). 1,209,294 station-hours, 422 stations. Decisions:
+  - Lane flow above 2,500 is kept with `flag_high_flow`; **run every model with and without these rows.**
+  - Main instrument uses **all CHP incidents** (Bento matched "every traffic incident report"); robustness checks use collisions only, and collisions plus hit-and-run.
+  - Holidays kept with a flag; balanced-panel check on the 151 stations present in all nine months.
+  - PeMS has no real D7 readings on 28 Feb, 27 May, 30 Aug–1 Sep, 5–7 Sep and 30 Sep 2026 (district-wide outages).
+- **What Bento et al. report about cleaning** [Certain]: only mainline stations and "station-hour observations where all the component detectors are reporting". There's no flow cap (their max lane flow is 5,173), and nothing on stuck detectors or holidays. Their incident counts also conflict: "more than 14,000 incidents" at "around 450 per day" implies about 31 days, while Table 1's 471/day over 92 days implies about 43,000.
 
 **First job.** Get the Bento Dataverse package and inventory it:
 - files and variables,
