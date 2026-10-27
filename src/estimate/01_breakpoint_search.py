@@ -1,7 +1,8 @@
-"""Breakpoint search for the speed-density kink (Bento et al. eq. 4), PRELIMINARY.
+"""Breakpoint search for the speed-density kink (Bento et al. eq. 4).
 
 For each candidate breakpoint b = 1..50 veh/mile/lane, fit by OLS
-    log(speed) = beta * f_b(density) + gamma * D7_VMT + station + hour + dow + month FE
+    log(speed) = beta * f_b(density) + controls + station + hour + dow + month FE
+with controls = temperature, temperature squared, wind, precipitation, gas price, D7 VMT
 and pick b with the lowest AIC. Every fit has the same number of parameters, so
 the lowest AIC is the lowest residual sum of squares.
 
@@ -11,8 +12,7 @@ Two forms of f_b, because Bento et al.'s eq. 4 is ambiguous:
 Two samples, as agreed: with and without flag_high_flow rows.
 Station-hours with an incident on their own link are excluded, as in Bento et al.
 
-PRELIMINARY: weather and gas-price controls are not yet in (Bento et al. include
-them). Re-run once they are added.
+Station-hours with no weather reading at any of the six stations are dropped (0.4%).
 
 Fixed effects are partialled out once for all candidate regressors (Frisch-Waugh),
 which gives the same coefficients and residuals as separate fits.
@@ -33,23 +33,25 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 BREAKS = np.arange(1, 51)
 FE = ["station", "hour", "dow", "month"]
+CONTROLS = ["temp_c", "temp2", "wind_ms", "precip_mm", "gas_price", "vmt_m"]
 
 
 def search(d):
     y = np.log(d.speed.to_numpy())
     dens = d.density.to_numpy()
     above = dens[:, None] > BREAKS[None, :]
-    cols = [y[:, None], (d.d7_vmt.to_numpy() / 1e6)[:, None],
+    cols = [y[:, None], d[CONTROLS].to_numpy(),
             dens[:, None] * above, (dens[:, None] - BREAKS[None, :]) * above]
     X = np.hstack(cols).astype(np.float64)
     flist = np.column_stack([pd.factorize(d[c])[0] for c in FE]).astype(np.uint64)
     Xd, ok = demean(X, flist, np.ones(len(d)), tol=1e-8, maxiter=100_000)
     if not ok:
         raise RuntimeError("demeaning did not converge")
-    yd, vd = Xd[:, 0], Xd[:, 1]
+    k = len(CONTROLS)
+    yd, vd = Xd[:, 0], Xd[:, 1:1 + k]
     n, nb = len(d), len(BREAKS)
     rows = []
-    for form, offset in [("as_written", 2), ("hinge", 2 + nb)]:
+    for form, offset in [("as_written", 1 + k), ("hinge", 1 + k + nb)]:
         for j, b in enumerate(BREAKS):
             Z = np.column_stack([Xd[:, offset + j], vd])
             coef, *_ = np.linalg.lstsq(Z, yd, rcond=None)
@@ -65,14 +67,16 @@ def search(d):
 
 def main():
     d = pd.read_parquet(DATA)
-    d = d[~d.own_link_incident]
+    d = d[~d.own_link_incident].dropna(subset=["temp_c", "wind_ms"]).copy()
+    d["temp2"] = d.temp_c ** 2
+    d["vmt_m"] = d.d7_vmt / 1e6
     out = []
     for sample, sel in [("all_rows", np.ones(len(d), bool)), ("excl_high_flow", ~d.flag_high_flow.to_numpy())]:
         r = search(d[sel])
         r["sample"] = sample
         out.append(r)
     res = pd.concat(out, ignore_index=True)
-    res.to_csv(OUT / "breakpoint_search_preliminary.csv", index=False)
+    res.to_csv(OUT / "breakpoint_search.csv", index=False)
 
     best = res.loc[res.groupby(["sample", "form"]).aic_rel.idxmin()]
     print(best[["sample", "form", "breakpoint", "beta", "n", "n_above"]].to_string(index=False))
@@ -92,10 +96,10 @@ def main():
         ax.set_ylabel("AIC minus its minimum (millions)")
         ax.spines[["top", "right"]].set_visible(False)
         ax.grid(color="#e8e6e1")
-    fig.text(0.01, 0.01, "PRELIMINARY: station, hour, day-of-week, month FE and D7 VMT; no weather or gas price yet. "
+    fig.text(0.01, 0.01, "Station, hour, day-of-week, month FE; temperature, temperature squared, wind, precipitation, gas price, D7 VMT. "
              "D7 2026 cleaned station-hours, own-link incident hours excluded.", fontsize=8, color="#52514e")
     fig.tight_layout(rect=(0, 0.05, 1, 1))
-    fig.savefig(OUT / "breakpoint_search_preliminary.png", dpi=150)
+    fig.savefig(OUT / "breakpoint_search.png", dpi=150)
 
 
 if __name__ == "__main__":
