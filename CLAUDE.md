@@ -1,6 +1,6 @@
 # Congestion Pricing on California Freeways: Project Brief
 
-This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 26 Oct 2026 (end of the second working session).
+This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 27 Oct 2026.
 
 Confidence tags carried over from earlier discussion:
 - **[Certain]**: read directly from the paper or checked by arithmetic.
@@ -11,7 +11,17 @@ Confidence tags carried over from earlier discussion:
 
 ## 0. Read this first
 
-### Start here (next session, 27 Oct 2026)
+### Status 27 Oct 2026: analysis complete (deadline 28 Oct)
+
+Inderpal asked for everything done by 28 Oct, so the design was cut down (agreed 27 Oct). **Results: `output/estimation/RESULTS.md`.** The write-up (Claude Doc "Pricing the Hidden Cost of One More Car on Los Angeles Freeways") has a Results section.
+- **Dropped for time:** Google routes, LODES, validation on the Dataverse 2017 data, District 4. The Google key is no longer needed.
+- **Instrument (our simplification):** an incident on a different freeway in the same direction, 0.5–3 miles away (`src/build/03_instrument.py`).
+- **Weather:** NOAA GHCNh, since ISD-Lite was retired in Aug 2025. Gas prices from EIA (`src/data/03_download_external.py`, `src/build/02_controls.py`).
+- **Breakpoint:** 19 (hinge form). Above the kink: OLS −0.0270, IV **−0.0378** (SE 0.0047), first stage 0.98 (F 11.3). Bento: −0.0244 / −0.0327 / F 15.9. Robust across variants.
+- **Time of day:** slopes are flat across brackets from 06 to 20 (−0.027 to −0.029). Koch-style elasticities per bracket track the single-curve prediction (correlation 0.98), so **traffic moves along one curve; the curve doesn't shift.**
+- **Welfare** (ε −2, VOT $24.30): peak hourly toll 27¢/mile, flat toll 12¢; a flat toll gets about 80% of the hourly gain; clock-based tolls get under 30% of the first best (station × hour).
+
+### Earlier plan (26 Oct, superseded by the cut-down design above)
 
 **Done so far:** design settled; 2026 D7 data collected and checked; EDA; cleaning (rules agreed); links, incident matching, own-link flags and D7 VMT built; preliminary breakpoint search. Everything is on branch `claude/brief-2026-data`, in draft PR ipsanmoljj/urban_eco#1.
 
