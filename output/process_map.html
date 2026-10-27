@@ -1,0 +1,306 @@
+<title>One More Car: Project Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: a freeway route read top to bottom. Six numbered "exits" (the real order of the work), a row funnel, the instrument logic, and the results at the end of the road. */
+:root {
+  --bg: #f5f6f3;
+  --panel: #ffffff;
+  --ink: #15201b;
+  --ink-2: #4c5a53;
+  --line: #d5dbd6;
+  --sign: #0b6b45;        /* freeway guide-sign green */
+  --sign-ink: #ffffff;
+  --shield: #1d4f91;      /* interstate shield blue */
+  --amber: #b86a00;       /* incident / caution */
+  --amber-bg: #fbf1e2;
+  --drop: #8a8f8b;
+  --road: #2b302d;
+  --stripe: #f2c230;
+  --f-display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111613; --panel: #19201c; --ink: #e8eee9; --ink-2: #a9b6ae; --line: #2f3a34;
+    --sign: #1f8a5c; --sign-ink: #ffffff; --shield: #5b8fd6; --amber: #e3a04a; --amber-bg: #2a2216;
+    --drop: #7d857f; --road: #0b0e0c; --stripe: #e0b52c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111613; --panel: #19201c; --ink: #e8eee9; --ink-2: #a9b6ae; --line: #2f3a34;
+  --sign: #1f8a5c; --sign-ink: #ffffff; --shield: #5b8fd6; --amber: #e3a04a; --amber-bg: #2a2216;
+  --drop: #7d857f; --road: #0b0e0c; --stripe: #e0b52c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 800; letter-spacing: -0.01em; line-height: 1.05; }
+h2 { font-size: 22px; font-weight: 800; }
+h3 { font-size: 17px; font-weight: 800; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+.lede { max-width: 66ch; color: var(--ink-2); font-size: 17px; }
+header { display: grid; gap: 14px; }
+
+/* Guide sign for the question */
+.sign {
+  background: var(--sign); color: var(--sign-ink); border-radius: 10px; padding: 20px 24px;
+  border: 3px solid var(--sign-ink); outline: 3px solid var(--sign); display: grid; gap: 10px;
+}
+.sign .q { font-family: var(--f-display); font-weight: 800; font-size: clamp(19px, 2.6vw, 25px); line-height: 1.2; }
+.forks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fork { border-top: 2px solid rgba(255,255,255,.55); padding-top: 8px; font-size: 15px; }
+.fork b { font-family: var(--f-display); display: block; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* The route of exits */
+.route { position: relative; display: grid; gap: 0; }
+.exit {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 18px; position: relative; padding-bottom: 26px;
+}
+.exit::before { /* road segment */
+  content: ""; position: absolute; left: 27px; top: 54px; bottom: 0; width: 10px; background: var(--road);
+  background-image: linear-gradient(var(--stripe) 50%, transparent 50%); background-size: 2px 16px; background-repeat: repeat-y; background-position: center;
+  border-radius: 2px;
+}
+.exit:last-child::before { display: none; }
+.tab {
+  width: 64px; height: 54px; border-radius: 8px; background: var(--sign); color: var(--sign-ink);
+  display: grid; place-items: center; text-align: center; font-family: var(--f-display); line-height: 1; position: relative; z-index: 1;
+  border: 2px solid var(--sign-ink); outline: 2px solid var(--sign);
+}
+.tab small { font-size: 10px; letter-spacing: .14em; font-weight: 600; display: block; }
+.tab span { font-size: 24px; font-weight: 800; display: block; margin-top: 2px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.card .what { color: var(--ink-2); max-width: 70ch; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; }
+.item { display: grid; gap: 2px; min-width: 0; }
+.item .k { font-family: var(--f-display); font-weight: 800; font-size: 14px; }
+.item .v { font-size: 14.5px; color: var(--ink-2); }
+.files { display: flex; flex-wrap: wrap; gap: 6px; }
+.file { font-family: var(--f-mono); font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-2); overflow-wrap: anywhere; }
+.stat { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+.caution {
+  border-left: 4px solid var(--amber); background: var(--amber-bg); padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px;
+}
+.caution b { font-family: var(--f-display); color: var(--amber); letter-spacing: .03em; }
+
+/* Row funnel */
+.funnel { display: grid; gap: 8px; }
+.fbar { display: grid; grid-template-columns: minmax(150px, 230px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.fbar .lab { font-size: 14px; color: var(--ink-2); }
+.fbar .track { position: relative; height: 26px; }
+.fbar .fill { height: 100%; background: var(--shield); border-radius: 3px; min-width: 3px; }
+.fbar .num { position: absolute; top: 3px; font-family: var(--f-mono); font-size: 13px; font-weight: 600; white-space: nowrap; color: var(--ink); }
+
+/* Instrument diagram */
+.diagram { overflow-x: auto; }
+.diagram svg { display: block; min-width: 640px; width: 100%; height: auto; }
+.diagram text { font-family: var(--f-display); }
+
+/* Detour: what we dropped */
+.dropped { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--f-display); font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px dashed var(--drop); color: var(--drop); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+/* Results */
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.res { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.res .big { font-family: var(--f-display); font-weight: 800; font-size: 30px; line-height: 1; color: var(--sign); }
+.res .vs { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); }
+.res p { font-size: 14.5px; }
+.answer { background: var(--panel); border: 2px solid var(--sign); border-radius: 10px; padding: 18px 20px; display: grid; gap: 8px; }
+.answer h2 { color: var(--sign); }
+section { display: grid; gap: 14px; }
+footer { color: var(--ink-2); font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 560px) {
+  .exit { grid-template-columns: 48px minmax(0, 1fr); gap: 12px; }
+  .tab { width: 48px; height: 46px; }
+  .tab span { font-size: 19px; }
+  .exit::before { left: 19px; top: 46px; }
+  .forks { grid-template-columns: 1fr; }
+  .fbar { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Urban economics project · District 7, Los Angeles · Jan–Sep 2026</div>
+    <h1>Pricing one more car: how we got from sensor data to a toll</h1>
+    <p class="lede">A map of the whole project. Follow the road from top to bottom: each exit is one stage of the work, with what went in, what we did, what came out, and the file that does it.</p>
+  </header>
+
+  <div class="sign" role="note" aria-label="Research question">
+    <div class="eyebrow" style="color:inherit;opacity:.85">The question</div>
+    <div class="q">Is rush hour expensive because more cars use the same road, or because the road itself behaves differently at rush hour?</div>
+    <div class="forks">
+      <div class="fork"><b>Same curve</b>Peak hours just sit further along one speed–density curve. Price by how crowded the road is.</div>
+      <div class="fork"><b>Shifting curve</b>The curve itself moves with the clock. Price by time of day.</div>
+    </div>
+  </div>
+
+  <div class="route" aria-label="Project stages">
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>1</span></div></div>
+      <div class="card">
+        <h3>Collect the data</h3>
+        <p class="what">Everything that goes into the model, all for LA and Ventura counties, January to September 2026.</p>
+        <div class="row">
+          <div class="item"><span class="k">Traffic sensors (PeMS)</span><span class="v">Cars per hour and speed for every station and hour: <span class="stat">32.1M</span> rows.</span></div>
+          <div class="item"><span class="k">Incidents (CHP)</span><span class="v">Every crash, hazard and stall with time and location: <span class="stat">102,544</span>.</span></div>
+          <div class="item"><span class="k">Station list</span><span class="v">Where each sensor is, its freeway, direction and lanes.</span></div>
+          <div class="item"><span class="k">Controls</span><span class="v">Hourly weather from 6 airports (NOAA), weekly LA gas price (EIA), total district traffic.</span></div>
+        </div>
+        <div class="files"><span class="file">src/data/01_load_raw.py</span><span class="file">src/data/03_download_external.py</span></div>
+      </div>
+    </div>
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>2</span></div></div>
+      <div class="card">
+        <h3>Look before using it</h3>
+        <p class="what">Exploratory checks on the raw data. Two findings shaped everything after.</p>
+        <div class="caution"><b>86% of station-hours are not real readings.</b> When a sensor breaks, PeMS fills in an estimate from its neighbours. Those estimates can't tell us how traffic behaves, so they have to go.</div>
+        <div class="caution"><b>Working sensors are lopsided.</b> Almost half sit on I-10 and I-210, while crashes cluster on I-5, I-405 and I-110. Working sensors fall from 267 an hour in January to 140 in September.</div>
+        <div class="files"><span class="file">src/eda/eda.py</span><span class="file">output/eda/EDA_REPORT.md</span></div>
+      </div>
+    </div>
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>3</span></div></div>
+      <div class="card">
+        <h3>Clean it</h3>
+        <p class="what">Rules agreed with the team. Each step removes rows we can't trust.</p>
+        <div class="funnel" role="img" aria-label="Rows left after each cleaning step, from 32.1 million to 1.19 million">
+          <div class="fbar"><span class="lab">All rows, all lane types</span><div class="track"><div class="fill" style="width:100%"></div><span class="num" style="left:calc(100% - 64px);color:#fff">32.1M</span></div></div>
+          <div class="fbar"><span class="lab">Main lanes only</span><div class="track"><div class="fill" style="width:39.2%"></div><span class="num" style="left:calc(39.2% + 8px)">12.6M</span></div></div>
+          <div class="fbar"><span class="lab">Real readings only</span><div class="track"><div class="fill" style="width:3.8%"></div><span class="num" style="left:calc(3.8% + 8px)">1.23M</span></div></div>
+          <div class="fbar"><span class="lab">Faulty sensors removed</span><div class="track"><div class="fill" style="width:3.77%"></div><span class="num" style="left:calc(3.77% + 8px)">1.21M · 422 stations</span></div></div>
+          <div class="fbar"><span class="lab">Own-stretch crash hours out</span><div class="track"><div class="fill" style="width:3.71%"></div><span class="num" style="left:calc(3.71% + 8px)">1.19M used in models</span></div></div>
+        </div>
+        <div class="files"><span class="file">src/data/02_clean.py</span><span class="file">data/cleaned/</span></div>
+      </div>
+    </div>
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>4</span></div></div>
+      <div class="card">
+        <h3>Build the instrument</h3>
+        <p class="what">A simple comparison of speed and traffic mixes up cause and effect, because rain or a crash changes both. We need cars that arrive on our road for a reason unrelated to our road: drivers fleeing an incident on a nearby parallel freeway.</p>
+        <div class="diagram">
+          <svg viewBox="0 0 760 250" role="img" aria-label="An incident on a parallel freeway pushes drivers onto the studied freeway, adding cars there; the speed drop that follows measures the effect of extra cars. Incidents on the studied stretch itself are excluded.">
+            <!-- parallel freeway -->
+            <rect x="20" y="40" width="720" height="34" rx="4" fill="var(--road)"/>
+            <line x1="20" y1="57" x2="740" y2="57" stroke="var(--stripe)" stroke-width="2" stroke-dasharray="14 12"/>
+            <text x="28" y="30" font-size="13" font-weight="600" fill="var(--ink-2)">PARALLEL FREEWAY (0.5–3 miles away, same direction)</text>
+            <!-- incident -->
+            <g transform="translate(220 57)">
+              <polygon points="0,-20 18,14 -18,14" fill="var(--amber)"/>
+              <text x="0" y="9" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">!</text>
+            </g>
+            <text x="250" y="100" font-size="13" font-weight="600" fill="var(--amber)">Incident this hour</text>
+            <!-- detour arrow -->
+            <path d="M 300 76 C 340 120, 380 130, 420 168" fill="none" stroke="var(--shield)" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arr)"/>
+            <text x="360" y="128" font-size="13" font-weight="600" fill="var(--shield)">drivers reroute</text>
+            <!-- studied freeway -->
+            <rect x="20" y="176" width="720" height="34" rx="4" fill="var(--road)"/>
+            <line x1="20" y1="193" x2="740" y2="193" stroke="var(--stripe)" stroke-width="2" stroke-dasharray="14 12"/>
+            <text x="28" y="236" font-size="13" font-weight="600" fill="var(--ink-2)">OUR FREEWAY</text>
+            <!-- sensor -->
+            <g transform="translate(470 193)">
+              <rect x="-26" y="-12" width="52" height="24" rx="4" fill="var(--sign)" stroke="var(--sign-ink)" stroke-width="2"/>
+              <text x="0" y="5" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sign-ink)">SENSOR</text>
+            </g>
+            <text x="510" y="166" font-size="13" font-weight="600" fill="var(--ink)">+0.98 cars per mile per lane → speed falls</text>
+            <!-- own-link exclusion -->
+            <g transform="translate(650 193)">
+              <polygon points="0,-16 14,11 -14,11" fill="var(--drop)"/>
+            </g>
+            <text x="612" y="236" font-size="12" fill="var(--drop)">crash on own stretch: hour dropped</text>
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--shield)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="row">
+          <div class="item"><span class="k">Freeway links</span><span class="v"><span class="stat">1,137</span> interchange-to-interchange stretches, located from ramp sensors.</span></div>
+          <div class="item"><span class="k">Incident matching</span><span class="v">Each incident to the nearest sensor within 1 mile, same freeway and direction: <span class="stat">94%</span> matched.</span></div>
+          <div class="item"><span class="k">Coverage</span><span class="v"><span class="stat">159</span> of 422 sensors have a parallel freeway; <span class="stat">1.3%</span> of hours are treated.</span></div>
+        </div>
+        <div class="caution"><b>Our shortcut.</b> Bento et al. used Google Maps routes for real commutes. We used nearby parallel freeways instead, to finish in time. Say so in the write-up.</div>
+        <div class="files"><span class="file">src/build/01_links_incidents_vmt.py</span><span class="file">src/build/02_controls.py</span><span class="file">src/build/03_instrument.py</span></div>
+      </div>
+    </div>
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>5</span></div></div>
+      <div class="card">
+        <h3>Estimate</h3>
+        <p class="what">Every model compares each sensor with itself at similar times (station, hour, weekday and month effects) and controls for weather, gas prices and district traffic.</p>
+        <div class="row">
+          <div class="item"><span class="k">a · Find the kink</span><span class="v">Try every threshold from 1 to 50 cars per mile per lane; keep the best fit. Result: <span class="stat">19</span>.</span></div>
+          <div class="item"><span class="k">b · Slowdown per car</span><span class="v">Simple regression vs crash-based (IV), below and above the kink, plus six robustness checks.</span></div>
+          <div class="item"><span class="k">c · Time of day</span><span class="v">Slope and kink for each two-hour window, and Koch et al.'s elasticity against what one curve predicts.</span></div>
+        </div>
+        <div class="files"><span class="file">src/estimate/01_breakpoint_search.py</span><span class="file">src/estimate/02_main_estimates.py</span><span class="file">src/estimate/03_time_of_day.py</span></div>
+      </div>
+    </div>
+
+    <div class="exit">
+      <div class="tab" aria-hidden="true"><div><small>EXIT</small><span>6</span></div></div>
+      <div class="card">
+        <h3>Turn it into tolls</h3>
+        <p class="what">Bento et al.'s road model: speed is flat to the kink, then falls 3.8% per extra car; past peak flow, cars queue. Time is valued at $24.30 per vehicle-hour, and drivers cut trips when charged (elasticity −2.0, with a range). For 9,931 station × hour cases we find the toll that maximises welfare under four policies.</p>
+        <div class="row">
+          <div class="item"><span class="k">Ideal</span><span class="v">A separate toll for every station and hour.</span></div>
+          <div class="item"><span class="k">Hourly</span><span class="v">One toll per hour, the same everywhere.</span></div>
+          <div class="item"><span class="k">Two-hour</span><span class="v">One toll per two-hour window.</span></div>
+          <div class="item"><span class="k">Flat</span><span class="v">One toll all day, everywhere.</span></div>
+        </div>
+        <div class="files"><span class="file">src/estimate/04_welfare.py</span><span class="file">output/estimation/RESULTS.md</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <section aria-label="Results">
+    <div class="eyebrow">End of the road: what we found</div>
+    <div class="results">
+      <div class="res"><span class="big">3.8%</span><p>Speed lost for each extra car per mile per lane, past the kink (crash-based).</p><span class="vs">Bento 2017: 3.3% · simple regression: 2.7%</span></div>
+      <div class="res"><span class="big">19</span><p>Cars per mile per lane where speed starts to fall.</p><span class="vs">Bento 2017: 21</span></div>
+      <div class="res"><span class="big">2.7–2.9%</span><p>Slowdown per car in every two-hour window from 6 am to 8 pm. The curve doesn't move with the clock.</p><span class="vs">Koch-style elasticity tracks one curve: r = 0.98</span></div>
+      <div class="res"><span class="big">27¢</span><p>Best hourly toll per mile at 4–5 pm; near zero at night. Best flat toll: 12¢.</p><span class="vs">Bento 2017: 33¢ at peak</span></div>
+      <div class="res"><span class="big">80%</span><p>Share of the hourly toll's gain that a flat toll already gets.</p><span class="vs">Koch, Berlin: 78%</span></div>
+      <div class="res"><span class="big">&lt; 30%</span><p>Share of the ideal gain that any clock-based toll captures. The rest needs pricing by where the road is crowded.</p><span class="vs">Ideal gain: 11.8¢ per vehicle-mile</span></div>
+    </div>
+    <div class="answer">
+      <h2>Answer: same curve</h2>
+      <p>Rush hour is expensive because the road is crowded, not because of the hour. A toll that follows real-time crowding would do what a time-of-day schedule does, and much more.</p>
+    </div>
+  </section>
+
+  <section aria-label="What we dropped">
+    <div class="eyebrow">Detours we skipped to finish on time</div>
+    <div class="dropped">
+      <span class="chip">Google Maps commute routes</span>
+      <span class="chip">Census commute data (LODES)</span>
+      <span class="chip">Checking our code on Bento's 2017 data</span>
+      <span class="chip">San Francisco Bay Area (District 4)</span>
+    </div>
+    <p style="color:var(--ink-2);font-size:14.5px;max-width:70ch">These go in the write-up as limitations and future work. The weakest point is the instrument: moderately strong above the kink (F = 11.3, against Bento's 15.9) and too weak below it.</p>
+  </section>
+
+  <footer>Data: Caltrans PeMS station-hour data and CHP incidents, District 7, January–September 2026; NOAA GHCNh hourly weather; EIA weekly Los Angeles gasoline prices. Method after Bento, Hall &amp; Heilmann (2023), Koch, Ritter, Rohlf &amp; Thies (2023) and Parry (2009). Code: github.com/ipsanmoljj/urban_eco.</footer>
+</div>
