@@ -1,6 +1,6 @@
 # Congestion Pricing on California Freeways: Project Brief
 
-This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 27 Oct 2026.
+This is the handoff from claude.ai ("urban project", Oct 2026) to Claude Code. It is current as of 28 Oct 2026.
 
 Confidence tags carried over from earlier discussion:
 - **[Certain]**: read directly from the paper or checked by arithmetic.
@@ -20,6 +20,12 @@ Inderpal asked for everything done by 28 Oct, so the design was cut down (agreed
 - **Breakpoint:** 19 (hinge form). Above the kink: OLS −0.0270, IV **−0.0378** (SE 0.0047), first stage 0.98 (F 11.3). Bento: −0.0244 / −0.0327 / F 15.9. Robust across variants.
 - **Time of day:** slopes are flat across brackets from 06 to 20 (−0.027 to −0.029). Koch-style elasticities per bracket track the single-curve prediction (correlation 0.98), so **traffic moves along one curve; the curve doesn't shift.**
 - **Welfare** (ε −2, VOT $24.30): peak hourly toll 27¢/mile, flat toll 12¢; a flat toll gets about 80% of the hourly gain; clock-based tolls get under 30% of the first best (station × hour).
+
+**Deliverables (28 Oct 2026):**
+- **Write-up:** the Claude Doc has a Results section; the team restructured it into Introduction, Literature, Objective, Empirical strategy, Data sources, Methodology, Results, Limitations. The 104 hours / $9.7bn figures in the Introduction still need a source.
+- **Slides:** `presentation/main.tex` (IIT Roorkee Beamer theme, 29 slides) and `presentation/figures/`, packaged as `presentation/overleaf_upload.zip`. Upload into the IITR Overleaf template, which holds the theme files and background images. **Not compile-tested here** (running a downloaded TeX engine was blocked); checked only for balanced environments, braces and `$`, and table column counts. Verify Koch et al. initials and the Verhoef (2001) reference.
+- **Project map:** `output/process_map.html`, published as the artifact https://claude.ai/artifact/KE21XwjFReehFQeRMymihU (private until shared).
+- **Explaining the kink to the team:** speed is flat at free flow below the breakpoint and falls above it. The breakpoint is chosen by fitting the model for every b = 1..50 and keeping the lowest AIC; with equal parameter counts, that is the smallest residual sum of squares. Bento's text says AIC is "maximized", which is a slip, and their printed eq. 4 can't give 21 (see above).
 
 ### Earlier plan (26 Oct, superseded by the cut-down design above)
 
