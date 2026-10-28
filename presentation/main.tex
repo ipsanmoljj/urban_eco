@@ -23,6 +23,8 @@
 \usepackage{amssymb}
 \usepackage{tikz, graphicx}
 \usepackage{booktabs}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
@@ -109,36 +111,55 @@ $\Rightarrow$ hour-of-day tolls justified on their own.
 %==========================================================
 \subsection{Findings, methods and empirics}
 \begin{frame}[t]{Parry (2009): the theory}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
 \begin{itemize}
-\item \hl{Optimal toll = MEC}: $\text{MEC} = \text{VOT}\cdot V \cdot \dfrac{\partial T}{\partial V}$ (value of time $\times$ traffic $\times$ slope of travel time).
-\item The toll must be evaluated at the \hl{post-toll} traffic level: tolls push some drivers off, so the optimal toll is \emph{below} MEC at today's traffic.
-\item Needs a \hl{demand response}, which cannot be observed before tolling exists $\Rightarrow$ report a range.
-\item A toll that \hl{varies with congestion} beats a single flat charge; how much better depends on how much congestion varies.
+\item \hl{Optimal toll = MEC}:\\ $\text{MEC} = \text{VOT}\cdot V \cdot \frac{\partial T}{\partial V}$
+\item Evaluate it at the \hl{post-toll} traffic level: tolls push drivers off, so the toll is \emph{below} MEC at today's traffic.
+\item Needs a \hl{demand response}, unobservable before tolling $\Rightarrow$ report a range.
+\item A toll that \hl{varies with congestion} beats a flat charge.
 \end{itemize}
-\vspace{0.5em}
+\end{column}
+\begin{column}{0.48\textwidth}
+\includegraphics[width=\textwidth]{lit_bento_fig1_standard_model.png}\\
+\tiny The standard model: drivers see only the private cost; the toll $\tau$ closes the gap to the marginal social cost and removes the deadweight loss. Source: Bento et al. (2023), Fig.~1.
+\end{column}
+\end{columns}
+\vspace{0.4em}
 \begin{block}{What we take}
-The MEC framework, post-toll evaluation, and the flat vs time-varying comparison.
+\small The MEC framework, post-toll evaluation, and the flat vs time-varying comparison.
 \end{block}
 \end{frame}
 
-\begin{frame}[t]{Bento, Hall \& Heilmann (2023): Los Angeles, 2017}
+\begin{frame}[t]{Bento et al. (2023): method}
 \small
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\textbf{Data}
-\begin{itemize}
-\item PeMS hourly data, 1,318 mainline stations, D7, 2017
-\item CHP incident reports; Google Maps routes for a 1\% sample of LODES commutes
-\end{itemize}
+\begin{column}{0.46\textwidth}
+\textbf{Data:} PeMS hourly data, 1,318 mainline stations, Los Angeles (D7), 2017; CHP incidents; Google Maps routes for a 1\% sample of LODES commutes.\\[0.5em]
 \textbf{Method}
 \begin{itemize}
 \item Instrument: a crash on an \hl{alternative route} pushes drivers onto the studied road
-\item Speed flat below a \hl{kink}, chosen by AIC: 21 veh/mile/lane
+\item Speed flat below a \hl{kink}, chosen by AIC: 21 cars/mile/lane
 \item 2SLS above and below the kink; station, hour, day, month FE
 \end{itemize}
 \end{column}
-\begin{column}{0.46\textwidth}
-\textbf{Findings (above the kink)}\\[0.3em]
+\begin{column}{0.52\textwidth}
+\includegraphics[width=\textwidth]{lit_bento_fig8_instrument.png}\\
+\tiny A crash on the green route: detectors on the blue alternative become ``treated''; detectors on the crash's own link are excluded. Source: Bento et al. (2023), Fig.~8.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[t]{Bento et al. (2023): findings}
+\small
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\includegraphics[width=\textwidth]{lit_bento_fig12a_speed_density.png}\\
+\tiny Estimated speed--density curve (orange) over the 2017 data: flat to the kink, then falling. Source: Bento et al. (2023), Fig.~12a.
+\end{column}
+\begin{column}{0.42\textwidth}
+\textbf{Above the kink}\\[0.3em]
 \begin{tabular}{lc}
 \toprule
 OLS slope & $-0.0244$ \\
@@ -147,38 +168,51 @@ KP F & $15.9$ \\
 \textbf{IV slope} & $\mathbf{-0.0327}$ \\
 \bottomrule
 \end{tabular}\\[0.5em]
-$\Rightarrow$ each extra car per mile per lane cuts speed by \hl{3.3\%}.\\[0.3em]
+Each extra car per mile per lane cuts speed by \hl{3.3\%}.\\[0.3em]
 Peak toll about \hl{33\textcent/mile}, near zero off-peak.
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}[t]{Koch, Ritter, Rohlf \& Thies (2023): Berlin, 2017}
+\begin{frame}[t]{Koch et al. (2023): method}
 \small
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\textbf{Data and method}
+\begin{column}{0.5\textwidth}
+\textbf{Berlin, 2017}
 \begin{itemize}
 \item INRIX GPS car trips, full year; trips clustered into drivers and routes
-\item Log--log model: $\ln(\text{time cost}) = \sigma \ln(\text{density}) + \dots$
+\item Log--log model:\\ $\ln(\text{time cost}) = \sigma \ln(\text{density}) + \dots$
 \item Instrument: number of nearby incidents
 \item Elasticity $\sigma$ estimated for each \hl{two-hour window}
 \end{itemize}
 \end{column}
-\begin{column}{0.46\textwidth}
-\textbf{Findings}
+\begin{column}{0.48\textwidth}
+\includegraphics[width=\textwidth]{lit_koch_fig10_mec_by_hour.png}\\
+\tiny Marginal external cost by two-hour window: high at the two peaks, near zero at night. Source: Koch et al. (2023), Fig.~10.
+\end{column}
+\end{columns}
+\vspace{0.3em}
+\begin{block}{What we take}
+\small Two-hour windows, the elasticity $\sigma$, and $\text{MEC} = \frac{\sigma}{1-\sigma}\times$ average time cost. Not the GPS machine-learning steps (we have fixed sensors).
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Koch et al. (2023): findings}
+\small
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\includegraphics[width=\textwidth]{lit_koch_fig11_charges.png}\\
+\tiny Optimal charges by time (green), peak/off-peak (orange) and uniform (blue), and the welfare gain of each. Source: Koch et al. (2023), Fig.~11.
+\end{column}
+\begin{column}{0.42\textwidth}
 \begin{itemize}
-\item Average $\sigma = 0.49$ (10\% more traffic $\Rightarrow$ 5\% slower trips)
+\item Average $\sigma = 0.49$: 10\% more traffic $\Rightarrow$ 5\% slower trips
 \item Peaks: 0.63 (8--10 am), \hl{0.67} (4--6 pm); quiet hours 0.08--0.17
 \item MEC 3--87 euro cents/km
-\item A uniform charge gets \hl{78\%} of the hourly charge's gain
+\item A uniform charge gets \hl{78\%} of the time-varying gain (771M vs 985M euros a year)
 \end{itemize}
 \end{column}
 \end{columns}
-\vspace{0.5em}
-\begin{block}{What we take}
-Two-hour windows, the elasticity $\sigma$, and the cost formula $\text{MEC} = \frac{\sigma}{1-\sigma}\times$ average time cost. Not the GPS machine-learning steps (we have fixed sensors).
-\end{block}
 \end{frame}
 
 \begin{frame}[t]{The gap we address}
@@ -212,8 +246,8 @@ Test whether Koch-style hourly differences are just \hl{density in disguise}, on
 %==========================================================
 \subsection{Data}
 \begin{frame}[t]{Data sources}
-\small
-\begin{tabular}{p{2.9cm}p{7.3cm}}
+\footnotesize
+\begin{tabular}{L{2.6cm}L{7.6cm}}
 \toprule
 \textbf{Source} & \textbf{What it gives us} \\
 \midrule
@@ -235,6 +269,7 @@ EIA & Weekly Los Angeles regular gasoline price \\
 \begin{frame}[t]{Cleaning: rows we can trust}
 \scriptsize
 \begin{center}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lrl}
 \toprule
 \textbf{Step} & \textbf{Rows left} & \textbf{Why} \\
@@ -246,7 +281,7 @@ All lanes reporting & 1,214,239 & otherwise per-lane density is wrong \\
 Flow $> 0$ & 1,211,954 & 0 cars at 68 mph = faulty sensor \\
 Drop 3 stuck stations & \hl{1,209,294} & speed never changes \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{center}
 \begin{itemize}
 \item Rules 1--2 follow Bento et al.; the rest are our additions.
@@ -274,26 +309,26 @@ Find something that adds cars to our road for a reason \hl{unrelated to our road
 \end{itemize}
 \end{frame}
 
-\begin{frame}[t]{Our instrument: incidents on a parallel freeway}
+\begin{frame}[t]{Our instrument}
 \begin{center}
-\begin{tikzpicture}[scale=0.9, every node/.style={font=\footnotesize}]
+\begin{tikzpicture}[x=0.95cm, y=0.95cm, every node/.style={font=\scriptsize}]
   % parallel freeway
-  \fill[Road] (0,2.6) rectangle (11,3.2);
-  \draw[yellow, dashed, thick] (0,2.9) -- (11,2.9);
-  \node[anchor=west] at (0,3.5) {Parallel freeway (different freeway, same direction, 0.5--3 miles away)};
-  \node[regular polygon, regular polygon sides=3, fill=Amber, minimum size=0.75cm, inner sep=0] at (3,2.9) {};
-  \node[text=Amber, font=\footnotesize\bfseries] at (3,2.1) {incident this hour};
+  \fill[Road] (0,2.6) rectangle (11,3.1);
+  \draw[yellow, dashed, thick] (0,2.85) -- (11,2.85);
+  \node[anchor=west] at (0,3.4) {Parallel freeway: different freeway, same direction, 0.5--3 miles away};
+  \node[regular polygon, regular polygon sides=3, fill=Amber, minimum size=0.6cm, inner sep=0] at (2.5,2.85) {};
+  \node[text=Amber, font=\scriptsize\bfseries, anchor=north] at (2.5,2.45) {incident this hour};
   % detour
-  \draw[-{Latex[length=3mm]}, very thick, dashed, IITRBlue] (3.8,2.5) .. controls (5,1.6) .. (6.2,0.95);
-  \node[text=IITRBlue, font=\footnotesize\bfseries] at (6.4,1.85) {drivers reroute};
+  \draw[-{Latex[length=2.5mm]}, very thick, dashed, IITRBlue] (3.3,2.5) .. controls (4.6,1.7) .. (6.0,0.85);
+  \node[text=IITRBlue, font=\scriptsize\bfseries, anchor=west] at (5.0,1.85) {drivers reroute};
   % our freeway
-  \fill[Road] (0,0.2) rectangle (11,0.8);
-  \draw[yellow, dashed, thick] (0,0.5) -- (11,0.5);
-  \node[anchor=west] at (0,-0.25) {Our freeway};
-  \node[draw=white, fill=IITRBlue, text=white, font=\scriptsize\bfseries, rounded corners] at (7,0.5) {SENSOR};
-  \node[anchor=west, font=\footnotesize\bfseries] at (7.6,1.15) {$+0.98$ cars/mile/lane};
-  \node[regular polygon, regular polygon sides=3, fill=gray, minimum size=0.6cm, inner sep=0] at (9.8,0.5) {};
-  \node[text=gray, anchor=west] at (8.2,-0.25) {crash on own stretch: hour dropped};
+  \fill[Road] (0,0.3) rectangle (11,0.8);
+  \draw[yellow, dashed, thick] (0,0.55) -- (11,0.55);
+  \node[anchor=west] at (0,0.0) {Our freeway};
+  \node[draw=white, fill=IITRBlue, text=white, font=\tiny\bfseries, rounded corners] at (6.6,0.55) {SENSOR};
+  \node[anchor=west, font=\scriptsize\bfseries] at (7.3,1.15) {$+0.98$ cars/mile/lane};
+  \node[regular polygon, regular polygon sides=3, fill=gray, minimum size=0.45cm, inner sep=0] at (9.7,0.55) {};
+  \node[text=gray, anchor=east] at (11,0.0) {crash on own stretch: hour dropped};
 \end{tikzpicture}
 \end{center}
 \small
@@ -327,7 +362,7 @@ D_{it} = \gamma\, Z_{it} + X_{it}'\delta + \alpha_i + \tau_h + \omega_d + \mu_m 
 \end{frame}
 
 \begin{frame}[t]{Time-of-day test and welfare model}
-\small
+\footnotesize
 \textbf{Does the curve shift by hour?}
 \begin{itemize}
 \item Slope $\beta_k$ and kink $b_k$ estimated separately for each two-hour window $k$; Wald test of equal slopes.
@@ -338,9 +373,9 @@ D_{it} = \gamma\, Z_{it} + X_{it}'\delta + \alpha_i + \tau_h + \omega_d + \mu_m 
 v(D)=\begin{cases} v_f & D\le b\\ v_f\,e^{\beta(D-b)} & D>b\end{cases},\qquad q = D\,v(D),\qquad \text{MEC} = \frac{\text{VOT}}{v}\cdot\frac{\sigma}{1-\sigma}
 \]
 \begin{itemize}
-\item Past peak flow, extra cars only queue (Verhoef 2001). Free-flow speed = 2--4 am average (67.4 mph).
-\item VOT \$24.30 per vehicle-hour; demand elasticity $-2.0$ (range $-0.67$ to $-2.0$).
-\item 9,931 station $\times$ hour cases; the best toll found for four policies: \hl{ideal} (station $\times$ hour), \hl{hourly}, \hl{two-hour}, \hl{flat}.
+\item Past peak flow, extra cars only queue (Verhoef 2001). Free flow = 2--4 am average (67.4 mph).
+\item VOT \$24.30/vehicle-hour; demand elasticity $-2.0$ (range $-0.67$ to $-2.0$).
+\item 9,931 station $\times$ hour cases; best toll for four policies: \hl{ideal} (station $\times$ hour), \hl{hourly}, \hl{two-hour}, \hl{flat}.
 \end{itemize}
 \end{frame}
 
@@ -359,7 +394,7 @@ v(D)=\begin{cases} v_f & D\le b\\ v_f\,e^{\beta(D-b)} & D>b\end{cases},\qquad q 
 \end{itemize}
 \end{frame}
 
-\begin{frame}[t]{EDA 2: estimates are not data; coverage is lopsided}
+\begin{frame}[t]{EDA 2: estimates and coverage}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \includegraphics[width=\textwidth]{fig3_imputed_vs_observed_speed.png}
@@ -493,8 +528,8 @@ Flat (12\textcent) & 2.7 & 23\% \\
 \section{Comparison with Literature}
 %==========================================================
 \begin{frame}[t]{What is different in our study}
-\small
-\begin{tabular}{p{2.3cm}p{3.9cm}p{3.9cm}}
+\footnotesize
+\begin{tabular}{L{2.3cm}L{3.9cm}L{3.9cm}}
 \toprule
  & \textbf{Bento et al. (2023)} & \textbf{This project} \\
 \midrule
@@ -512,6 +547,7 @@ Flat vs hourly & Not computed & True second-best flat toll \\
 \begin{frame}[t]{How our numbers compare}
 \small
 \begin{center}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
  & \textbf{Ours (LA 2026)} & \textbf{Bento (LA 2017)} & \textbf{Koch (Berlin 2017)} \\
@@ -523,11 +559,22 @@ Peak elasticity $\sigma$ & 0.61 (4--6 pm) & 0.69 at kink & 0.67 (4--6 pm) \\
 Peak toll & 27\textcent/mile & 33\textcent/mile & up to 42 euro c/km \\
 Flat vs time-varying & 80\% & -- & 78\% \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{center}
 \begin{itemize}
 \item Despite new data and a simpler instrument, we land \hl{close to Bento}.
 \item We reproduce Koch's hourly pattern, but show it is explained by \hl{density}, not the clock.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Results at a glance}
+\begin{center}
+\includegraphics[width=\textwidth]{results_at_a_glance.png}
+\end{center}
+\small
+\begin{itemize}
+\item \textbf{Left:} each two-hour window, placed at its typical density on our \emph{one} estimated curve. Night sits on the flat part (no toll); the peaks sit furthest down the slope (highest tolls).
+\item \textbf{Right:} clock-based tolls capture under 30\% of the gain from pricing each place by how crowded it is.
 \end{itemize}
 \end{frame}
 
